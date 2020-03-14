@@ -1,6 +1,6 @@
 # Git commit template
 
-## Process
+>## Process
 
 - create new file named .git-commit-message in the root of local project
 - provide necessary permission for accessing file (sudo chmod 777 ..git-commit-message)
@@ -24,11 +24,11 @@
 #    done
 #    wip
 ```
--Run this command to set customize commit template `git config --local commit.template .git-commit-message`
+- Run this command to set customize commit template `git config --local commit.template .git-commit-message`
 
 # Git pre-commit Hook
 
-## Process
+>## Process
 - create a file named `pre-commit` in `.git/hooks`
 - provide necessary permission to this file (`sudo chmod 777 pre-commit`)
 - copy and pest content bellow into `pre-commit` file
