@@ -58,23 +58,44 @@ copy and pest content bellow into `commit-msg` file
 ```
 #!/usr/bin/env bash
 
-test "" = "$(grep '^Signed-off-by: ' "$1" |
-     sort | uniq -c | sed -e '/^[   ]*1[    ]/d')" || {
-    echo >&2 Duplicate Signed-off-by lines.
-    exit 1
-}
-INPUT_FILE=$1
-START_LINE=`head -n1 $INPUT_FILE`
-# echo "$START_LINE"
-dev="^(dev): #[[:digit:]]+- "
-ftr="^(ftr): #[[:digit:]]+- "
-fix="^(fix): #[[:digit:]]+- "
-ref="^(ref): #[[:digit:]]+- "
-stl="^(stl): #[[:digit:]]+- "
-tst="^(tst): #[[:digit:]]+- "
-dbg="^(dbg): #[[:digit:]]+- "
-if ! [[ "$START_LINE" =~ $ftr ]] && ! [[ "$START_LINE" =~ $dev ]] && ! [[ "$START_LINE" =~ $fix ]] && ! [[ "$START_LINE" =~ $ref ]] && ! [[ "$START_LINE" =~ $stl ]] && ! [[ "$START_LINE" =~ $tst ]] && ! [[ "$START_LINE" =~ $dbg ]]; then
-  echo "Bad commit message, see example: dev-123: commit message"
+COMMIT_MSG=`grep -o '^[^(^#)|^(\*$)]*' $1`
+echo "$COMMIT_MSG"
+SAVEIFS=$IFS
+IFS=$'\n'
+LINES=($COMMIT_MSG)
+IFS=$SAVEIFS
+
+LINE_COUNT=$(expr "${#LINES[@]}" - 1)
+
+if [ "$LINE_COUNT" -lt 3 ]; then 
+  echo "Single line commit message is not allowed."
+  exit 1
+fi
+
+COMMIT_TITLE=${LINES[0]}
+# echo ${#COMMIT_TITLE}
+
+if [ "${#COMMIT_TITLE}" -gt 72 ]; then 
+  echo "Commit title must be less than or eqaul 72 char."
+  exit 1
+fi
+add="^(ADD):"
+dev="^(DEV):"
+ftr="^(FTR):"
+fix="^(FIX):"
+ref="^(REF):"
+stl="^(STL):"
+tst="^(TST):"
+dbg="^(DBG):"
+
+if ! [[ "$COMMIT_TITLE" =~ $ftr ]] && ! [[ "$COMMIT_TITLE" =~ $dev ]] && ! [[ "$COMMIT_TITLE" =~ $fix ]] && ! [[ "$COMMIT_TITLE" =~ $ref ]] && ! [[ "$COMMIT_TITLE" =~ $stl ]] && ! [[ "$COMMIT_TITLE" =~ $tst ]] && ! [[ "$COMMIT_TITLE" =~ $dbg ]] && ! [[ "$COMMIT_TITLE" =~ $add ]]; then
+  echo "Bad commit message, here is good example message: 
+
+    DEV: Waris User model
+    Functional description:
+    - added new model file users.ts for writing the user related business logics
+    - imported user.ts in user.controller.ts to consume the user functions
+  "
   exit 1
 fi
 ```
